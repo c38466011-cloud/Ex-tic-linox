@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08080a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Exotic Linox">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Exotic Linox</title>
+<style>
+  :root{
+    --bg:#08080a; --card:rgba(20,20,24,.86); --line:#2a2a32; --fg:#f3f3f6; --dim:#9a9aa6;
+    --red:#ff2d2d; --amber:#ffb020;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%}
+  body{
+    background:var(--bg); color:var(--fg);
+    font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    padding-bottom:calc(76px + env(safe-area-inset-bottom)); position:relative;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; z-index:-2;
+    background:url(bg.jpg) center 18% / cover no-repeat; opacity:.34;
+  }
+  body::after{
+    content:""; position:fixed; inset:0; z-index:-1;
+    background:linear-gradient(180deg,rgba(8,8,10,.55) 0%,rgba(8,8,10,.93) 46%,#08080a 78%);
+  }
+  header{
+    position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:10px;
+    padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
+    background:rgba(8,8,10,.86); backdrop-filter:blur(14px); border-bottom:1px solid var(--line);
+  }
+  header img{width:36px; height:36px; border-radius:9px; border:1px solid var(--line)}
+  .name{font-weight:800; font-size:16px; letter-spacing:-.4px; line-height:1.1}
+  .name span{color:var(--red)}
+  .name small{display:block; font-size:9.5px; font-weight:500; color:var(--dim); letter-spacing:.3px}
+  .dev{margin-left:auto; font-size:10.5px; font-weight:600; color:var(--dim); border:1px solid var(--line);
+       padding:3px 8px; border-radius:20px; max-width:44%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  main{padding:16px}
+  .view{display:none; animation:in .18s ease}
+  .view.on{display:block}
+  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2{font-size:12px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--dim); margin:0 0 10px}
+  .card{background:var(--card); backdrop-filter:blur(10px); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px}
+  .card h3{font-size:16px; margin:0 0 8px; font-weight:600; line-height:1.35}
+  .sub{font-size:12px; color:var(--dim); line-height:1.6; margin:0}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+  .pick{text-align:left; padding:12px; font:inherit; font-size:13px; line-height:1.3; font-weight:500;
+        background:var(--card); color:var(--fg); border:1px solid var(--line); border-radius:10px; cursor:pointer}
+  .pick small{display:block; font-size:10px; color:var(--dim); font-weight:400; margin-top:3px}
+  .pick.on{border-color:var(--red); background:rgba(255,45,45,.1)}
+  .tabs{display:flex; gap:8px; margin-bottom:12px}
+  .tab{flex:1; padding:10px; font:inherit; font-size:13px; font-weight:600; cursor:pointer;
+       background:var(--card); color:var(--dim); border:1px solid var(--line); border-radius:10px}
+  .tab.on{background:var(--red); color:#fff; border-color:var(--red)}
+  .row{display:flex; justify-content:space-between; gap:10px; font-size:13px; padding:9px 0; border-bottom:1px solid var(--line)}
+  .row:last-child{border:0}
+  .row span{color:var(--dim)}
+  .row b{font-variant-numeric:tabular-nums; white-space:nowrap}
+  .warn{font-size:12.5px; line-height:1.6; border-left:3px solid var(--amber); padding:8px 0 8px 11px; margin:0 0 12px; color:#ecd9b4}
+  .why{font-size:12.5px; line-height:1.6; color:var(--dim); border-left:2px solid var(--line); padding:6px 0 6px 10px; margin:0 0 14px}
+  .btn{width:100%; padding:13px; font:inherit; font-size:14px; font-weight:600; border:0; border-radius:11px;
+       background:var(--red); color:#fff; cursor:pointer}
+  .btn.ghost{background:transparent; color:var(--fg); border:1px solid var(--line)}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px}
+  .bar{height:6px; border-radius:6px; background:var(--line); overflow:hidden; margin-bottom:14px}
+  .bar i{display:block; height:100%; background:var(--red); width:0; transition:width .3s}
+  .presets{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+  .presets.four{grid-template-columns:repeat(4,1fr)}
+  .preset{text-align:center; padding:11px 6px; border:1px solid var(--line); border-radius:10px;
+          background:var(--card); cursor:pointer; font-size:12px; font-weight:600}
+  .preset small{display:block; font-size:9.5px; color:var(--dim); font-weight:400; margin-top:2px}
+  .preset.on{border-color:var(--red); background:rgba(255,45,45,.1)}
+  .phone{position:relative; width:100%; max-width:220px; aspect-ratio:9/19.5; margin:0 auto 12px;
+         border:2px solid var(--line); border-radius:24px; background:rgba(8,8,10,.8); overflow:hidden}
+  .dot{position:absolute; transform:translate(-50%,-50%); font-size:8px; font-weight:700; text-align:center;
+       padding:5px 4px; border-radius:7px; background:rgba(255,45,45,.16); border:1px solid var(--red);
+       color:#fff; min-width:36px; line-height:1.15}
+  .dot.fire{background:rgba(255,45,45,.45)}
+  ul{margin:8px 0 0; padding-left:18px; font-size:12.5px; line-height:1.75; color:var(--dim)}
+  nav{position:fixed; left:0; right:0; bottom:0; z-index:30; display:grid; grid-template-columns:repeat(5,1fr);
+      background:rgba(8,8,10,.96); backdrop-filter:blur(14px); border-top:1px solid var(--line);
+      padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+  nav button{background:none; border:0; color:var(--dim); font:inherit; font-size:9.5px; font-weight:600;
+             padding:5px 2px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px}
+  nav button.on{color:var(--red)}
+  nav svg{width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="icon-192.png" alt="Exotic Linox">
+  <div class="name">Exotic <span>Linox</span><small>COACH DE FREE FIRE</small></div>
+  <div class="dev" id="dev">—</div>
+</header>
+
+<main>
+  <section class="view on" id="v-guia">
+    <div class="bar"><i id="pbar"></i></div>
+    <div id="guide"></div>
+  </section>
+
+  <section class="view" id="v-marca">
+    <div class="tabs">
+      <button class="tab on" data-os="android">Android</button>
+      <button class="tab" data-os="ios">iOS</button>
+    </div>
+    <div class="grid" id="brands"></div>
+    <div id="detail" style="margin-top:14px"></div>
+  </section>
+
+  <section class="view" id="v-sensi">
+    <div class="card">
+      <h3>Sensibilidad</h3>
+      <p class="sub" style="margin-bottom:10px">Escala 0 a 200. Se aplica al perfil de disparo.</p>
+      <div class="presets" id="sensPresets"></div>
+    </div>
+    <div class="card" id="sensBody"></div>
+  </section>
+
+  <section class="view" id="v-disparo">
+    <div class="card">
+      <h3>Botón de disparo</h3>
+      <p class="sub" style="margin-bottom:10px">Elige el tamaño real de tu pantalla. La sensibilidad ya ajusta el resto.</p>
+      <div class="presets four" id="sizes"></div>
+    </div>
+    <div class="card" id="fireBody"></div>
+  </section>
+
+  <section class="view" id="v-hud">
+    <div class="card">
+      <h3>HUD por dedos</h3>
+      <div class="presets four" id="fingers"></div>
+    </div>
+    <div class="card">
+      <div class="phone" id="phone"></div>
+      <p class="sub" id="hudNote"></p>
+      <ul>
+        <li>Sube la opacidad del HUD si tapa enemigos a media distancia.</li>
+        <li>Disparo automático solo con escopeta y cuerpo a cuerpo.</li>
+        <li>Disparo al apuntar desactivado.</li>
+        <li>Cambia el HUD y juega dos partidas de entrenamiento antes de ranked.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button class="on" data-v="v-guia"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Guía</button>
+  <button data-v="v-marca"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>Marca</button>
+  <button data-v="v-sensi"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20V7"/></svg>Sensi</button>
+  <button data-v="v-disparo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Disparo</button>
+  <button data-v="v-hud"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 10h3M8 14h6"/></svg>HUD</button>
+</nav>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+let os = 'android', dev = null, preset = 'media', size = 'normal', fingers = 4, step = 0, flow = [];
+
+const UNI = [
+ {t:'Gráficos en Suave y FPS en Ultra', w:'Pedir detalle y fluidez a la vez hace que no llegue ninguna de las dos.'},
+ {t:'Sombras desactivadas y vibración del juego apagada', w:'La sombra se recalcula en cada frame y la vibración gasta batería.'},
+ {t:'Alta resolución solo con 8 GB de RAM o más', w:'En gama media te quita más fps de los que aporta en nitidez.'},
+ {t:'Mantén un 10 % de almacenamiento libre', w:'Con el disco lleno el sistema escribe en memoria y aparecen tirones.'},
+ {t:'Batería entre 40 y 90 %, sin cargar mientras juegas', w:'Cargar jugando sube la temperatura y el chip baja de vueltas.'},
+ {t:'Sin funda y sobre superficie fría', w:'El calor es el primer recortador de fps que existe.'},
+ {t:'Cierra todas las apps en segundo plano', w:'Cada app despierta le roba CPU y RAM al juego.'},
+ {t:'Desactiva Bluetooth, NFC y GPS', w:'Las radios encendidas consumen y generan interrupciones.'}
+];
+
+const DATA = {
+android: [
+ {id:'xiaomi',n:'Xiaomi / Redmi / POCO',b:'Game Turbo',w:'El ahorro de batería de HyperOS y MIUI es el freno número uno. Desactívalo antes que nada.',
+  s:['Seguridad, Game Turbo, añade Free Fire','En Game Turbo activa Rendimiento y desactiva el ahorro','Ajustes, Apps, Administrar apps, Free Fire, Ahorro de batería: Sin restricciones','Activa el inicio automático de Free Fire','Ajustes, Pantalla, Tasa de refresco: la máxima, nunca Automática','Desactiva brillo adaptativo y modo oscuro automático','Ajustes, Batería: desactiva Batería adaptativa','RAM Plus al mínimo o desactivado','Opciones de desarrollador: las tres animaciones a 0.5x','Reinicia antes de sesiones largas']},
+ {id:'samsung',n:'Samsung',b:'Game Booster',w:'Los Galaxy con Exynos se calientan y recortan fps rápido. Sin funda y sin cargar.',
+  s:['Game Launcher, Biblioteca, Free Fire, Game Booster','Fija Prioridad de rendimiento','Ajustes, Batería, Más ajustes, Velocidad de procesamiento: Máxima','Ajustes, Batería, Límites en segundo plano: Nunca en suspensión, añade Free Fire','Desactiva Batería adaptativa','Ajustes, Pantalla, Suavidad de movimiento: Adaptativa','Desactiva el ahorro de energía y el adaptativo','En Game Booster bloquea notificaciones y toques accidentales','Opciones de desarrollador: animaciones a 0.5x']},
+ {id:'bbk',n:'OnePlus / Oppo / Realme',b:'Game Space',w:'ColorOS y OxygenOS bajan el brillo solos al calentar. Fija el brillo a mano.',
+  s:['App Juegos o Game Space, añade Free Fire','Activa Pro Gamer, GT Mode o HyperBoost','Ajustes, Batería, Rendimiento: alto y sin optimización para Free Fire','Ajustes, Pantalla: tasa de refresco máxima fija','Desactiva la optimización inteligente de batería','Desactiva el brillo automático','Opciones de desarrollador: animaciones a 0.5x']},
+ {id:'vivo',n:'vivo / iQOO',b:'Monster Mode',w:'iQOO bloquea fps y baja el brillo al pasar de 40 grados. Enfría el teléfono.',
+  s:['Game Space, añade Free Fire','Activa Monster Mode','Ajustes, Batería: permite consumo alto en segundo plano','Desactiva la optimización de batería de Free Fire','Ajustes, Pantalla: tasa de refresco máxima fija','Opciones de desarrollador: animaciones a 0.5x']},
+ {id:'moto',n:'Motorola',b:'Moto Game Time',w:'El throttling térmico de Motorola es agresivo. Sesiones cortas y teléfono frío.',
+  s:['Moto Game Time, añade Free Fire, perfil de rendimiento','Ajustes, Batería: sin optimización para Free Fire','Desactiva Batería adaptativa','Ajustes, Pantalla: tasa de refresco alta fija','Opciones de desarrollador: animaciones a 0.5x']},
+ {id:'asus',n:'ASUS ROG / Zenfone',b:'X Mode',w:'X Mode sin ventilador calienta muy rápido. Úsalo con cooler o en partidas cortas.',
+  s:['Armoury Crate, perfil X Mode','Conecta el AeroActive Cooler si lo tienes','Game Genie: modo rendimiento y notificaciones bloqueadas','Asigna los AirTriggers a disparar y apuntar','Batería: sin restricciones para Free Fire','Opciones de desarrollador: animaciones a 0.5x']},
+ {id:'huawei',n:'Huawei / Honor',b:'App Assistant',w:'Sin servicios de Google el sistema mata apps más agresivamente. Fija el lanzamiento manual.',
+  s:['App Assistant, añade Free Fire, modo Juego','Ajustes, Batería, Lanzamiento manual: activa Free Fire','Desactiva el ahorro de energía inteligente','Ajustes, Pantalla: tasa de refresco alta','Opciones de desarrollador: animaciones a 0.5x']},
+ {id:'pixel',n:'Pixel / Android puro',b:'Modo de juego',w:'Los Pixel priorizan autonomía. La batería adaptativa es lo primero a apagar.',
+  s:['Ajustes, Apps, Free Fire, Modo de juego: Prioridad de rendimiento','Ajustes, Batería: desactiva Batería adaptativa','Ajustes, Batería: sin restricciones para Free Fire','Ajustes, Pantalla: tasa de refresco máxima, sin suavizado automático','Opciones de desarrollador: animaciones a 0.5x']}
+],
+ios: [
+ {id:'iphone',n:'iPhone, todos los modelos',b:'Modo de juego iOS 18',w:'iOS no tiene booster. El Modo de bajo consumo capa la GPU: es lo que más fps te quita.',
+  s:['Ajustes, Batería: Modo de bajo consumo DESACTIVADO','Ajustes, General, Actualización en segundo plano: desactivada','Ajustes, Accesibilidad, Movimiento, Reducir movimiento: activado','Ajustes, Pantalla y brillo, Bloqueo automático: Nunca','Brillo automático desactivado, brillo manual al 70 %','Crea una Concentración Juego y actívala al entrar','Ajustes, Accesibilidad, Asistencia guiada dentro de Free Fire','Cierra apps en segundo plano antes de jugar','Deja 10 % de almacenamiento libre','En iOS 18 el Modo de juego se activa solo, no lo desactives']},
+ {id:'ipad',n:'iPad, todos los modelos',b:'Modo de juego iOS 18',w:'En iPad sube 8 a 10 puntos la sensibilidad. La Asistencia guiada evita salir sin querer.',
+  s:['Ajustes, Batería: Modo de bajo consumo DESACTIVADO','Ajustes, Pantalla y brillo: deja ProMotion activado','Actualización en segundo plano desactivada','Asistencia guiada para bloquear multitarea','Brillo automático desactivado, brillo manual alto','iPad plano sobre la mesa, sin funda','Cierra apps y libera almacenamiento']}
+]};
+
+const SENS = {
+ alta:{v:{General:200,'Punto rojo':190,'Mira 2x':176,'Mira 4x':144,'Sniper':116,'Mirada libre':190},t:'Rush y corta distancia. Ya en el tope: si se pasa de largo, baja 5-8.'},
+ media:{v:{General:170,'Punto rojo':156,'Mira 2x':140,'Mira 4x':110,'Sniper':84,'Mirada libre':160},t:'Equilibrio. Punto de partida para la mayoría.'},
+ baja:{v:{General:130,'Punto rojo':116,'Mira 2x':100,'Mira 4x':76,'Sniper':56,'Mirada libre':120},t:'Precisión y larga distancia. Baja 8-12 más si tiemblas.'}
+};
+
+const FIRE = {pequena:{b:120,y:38,x:22,o:100,d:'2 dedos, pulgar derecho'},
+ normal:{b:100,y:46,x:16,o:90,d:'2 a 3 dedos'},
+ grande:{b:88,y:52,x:12,o:80,d:'3 a 4 dedos, índice derecho'},
+ tablet:{b:76,y:58,x:8,o:70,d:'4 dedos, ambos índices'}};
+const MULT = {alta:.85,media:1,baja:1.15};
+
+const HUD = {
+ 2:[{t:'Mira',x:80,y:60},{t:'Disparo',x:86,y:78,f:1},{t:'Salto',x:20,y:80},{t:'Agacharse',x:14,y:62},{t:'Recarga',x:32,y:88}],
+ 3:[{t:'Disparo',x:82,y:32,f:1},{t:'Mira',x:88,y:66},{t:'Salto',x:20,y:34},{t:'Joystick',x:20,y:80},{t:'Agacharse',x:16,y:60},{t:'Recarga',x:34,y:88}],
+ 4:[{t:'Disparo',x:84,y:30,f:1},{t:'Salto',x:16,y:30},{t:'Mira',x:90,y:62},{t:'Joystick',x:18,y:76},{t:'Agacharse',x:18,y:56},{t:'Recarga',x:36,y:88},{t:'Curar',x:64,y:88}],
+ 5:[{t:'Disparo',x:84,y:28,f:1},{t:'Salto',x:16,y:28},{t:'Mira',x:90,y:56},{t:'Joystick',x:18,y:72},{t:'Agacharse',x:30,y:44},{t:'Recarga',x:36,y:88},{t:'Curar',x:64,y:88},{t:'Granada',x:52,y:24}]
+};
+
+const L = {pequena:['Pequeña','<6.1"'],normal:['Normal','6.1-6.7"'],grande:['Grande','>6.7"'],tablet:['Tablet','8" o más']};
+const store = (k, v) => v === undefined ? localStorage.getItem('ex:'+k) : (v ? localStorage.setItem('ex:'+k,v) : localStorage.removeItem('ex:'+k));
+
+function go(v){
+  $$('.view').forEach(x=>x.classList.remove('on'));
+  $('#'+v).classList.add('on');
+  $$('nav button').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
+  window.scrollTo(0,0);
+}
+$$('nav button').forEach(b=>b.onclick=()=>{ if(b.dataset.v==='v-guia') renderGuia(); go(b.dataset.v); });
+
+function buildFlow(){
+  const d = DATA[os].find(x=>x.id===dev);
+  flow = [
+    ...(os==='ios'?[]:UNI).map((u,i)=>({type:'step', t:u.t, w:u.w, key:'u'+i})),
+    ...d.s.map((t,i)=>({type:'step', t, w:'Ajuste de sistema de tu marca. Si lo saltas, el teléfono sigue limitando el juego.', key:d.id+i})),
+    {type:'sens'},{type:'fire'},{type:'hud'},{type:'end'}
+  ];
+  step = 0;
+}
+
+function renderGuia(){
+  const box = $('#guide');
+  if(!dev){
+    $('#pbar').style.width = '0%';
+    box.innerHTML = `<div class="card"><h3>¿Qué dispositivo tienes?</h3>
+      <p class="sub" style="margin-bottom:10px">Elige el tuyo y te voy guiando paso a paso. Solo toca uno.</p>
+      <div class="tabs"><button class="tab on" data-os="android">Android</button><button class="tab" data-os="ios">iOS</button></div>
+      <div class="grid" id="gpick"></div></div>`;
+    $$('#guide .tab').forEach(t=>t.onclick=()=>{
+      $$('#guide .tab').forEach(x=>x.classList.remove('on')); t.classList.add('on'); os=t.dataset.os; renderGuia();
+    });
+    $('#gpick').innerHTML = DATA[os].map(d=>`<button class="pick" data-id="${d.id}">${d.n}<small>${d.b}</small></button>`).join('');
+    $$('#gpick .pick').forEach(b=>b.onclick=()=>{ dev=b.dataset.id; store('dev',os+':'+dev); buildFlow(); renderGuia(); renderBrands(); });
+    return;
+  }
+  const it = flow[step] || flow[0];
+  $('#pbar').style.width = ((step)/flow.length*100)+'%';
+  const total = flow.length;
+
+  if(it.type==='step'){
+    const done = store(it.key);
+    box.innerHTML = `<div class="card">
+      <p class="sub" style="margin-bottom:6px">Paso ${step+1} de ${total}</p>
+      <h3>${it.t}</h3>
+      <p class="why">${it.w}</p>
+      <button class="btn" id="ok">${done?'Siguiente':'Hecho, siguiente'}</button>
+      <div class="row2"><button class="btn ghost" id="skip">Saltar</button><button class="btn ghost" id="back">Atrás</button></div>
+    </div>`;
+    $('#ok').onclick = ()=>{ store(it.key,'1'); step++; renderGuia(); };
+    $('#skip').onclick = ()=>{ step++; renderGuia(); };
+    $('#back').onclick = ()=>{ if(step>0){step--; renderGuia();} };
+    return;
+  }
+
+  if(it.type==='sens'){
+    box.innerHTML = `<div class="card"><p class="sub" style="margin-bottom:6px">Paso ${step+1} de ${total}</p>
+      <h3>Elige tu sensibilidad</h3><p class="why">Se aplica sola al botón de disparo del paso siguiente.</p>
+      <div class="presets" id="sp"></div></div><div class="card" id="sb"></div>
+      <button class="btn" id="nx">Siguiente</button><div class="row2" style="margin-top:8px"><button class="btn ghost" id="back">Atrás</button></div>`;
+    renderSensInto($('#sp'), $('#sb'));
+    $('#nx').onclick=()=>{step++;renderGuia();}; $('#back').onclick=()=>{step--;renderGuia();};
+    return;
+  }
+
+  if(it.type==='fire'){
+    box.innerHTML = `<div class="card"><p class="sub" style="margin-bottom:6px">Paso ${step+1} de ${total}</p>
+      <h3>Botón de disparo</h3><p class="why">Con sensi ${preset} el botón ya viene ajustado. Solo dime el tamaño de pantalla.</p>
+      <div class="presets 
